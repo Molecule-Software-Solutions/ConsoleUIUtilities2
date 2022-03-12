@@ -1,6 +1,6 @@
 ﻿namespace ConsoleUIUtilities2
 {
-    internal static class CenteredLine
+    public static class CenteredLine
     {
         public static void PrintToConsole(string text, int row, ConsoleColor color = ConsoleColor.White)
         {

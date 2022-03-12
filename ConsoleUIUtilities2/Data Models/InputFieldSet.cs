@@ -17,9 +17,18 @@ namespace ConsoleUIUtilities2
             statusCallback?.Invoke("Input Added"); 
         }
 
-        public void SetInputFieldMarker(string inputFieldMarker)
+        public void AddInputRange(Input[] inputs, StatusCallback? statusCallback = null)
         {
-            m_InputFieldMarker = inputFieldMarker;
+            foreach (Input input in inputs)
+            {
+                m_Inputs.Add(input);
+                statusCallback?.Invoke("Input Added"); 
+            }
+        }
+
+        public void SetInputFieldMarker(string marker)
+        {
+            m_InputFieldMarker = marker; 
         }
 
         public void RemoveInput(string identifier, StatusCallback? statusCallback = null)
@@ -51,39 +60,48 @@ namespace ConsoleUIUtilities2
 
         public void WriteMultipleInputs(int startRow, int justification, ConsoleColor color = ConsoleColor.White)
         {
-            int rowPosition = startRow;
-            int inputFieldMarkerPosition = FindLongestPromptLine(); 
+            int currentRowPosition = startRow;
+            int longestInputLabel = FindLongestPromptLine(); 
 
-            foreach (Input input in m_Inputs)
+            foreach (Input item in m_Inputs)
             {
-                Console.SetCursorPosition(justification, rowPosition); 
+                Console.SetCursorPosition(justification, currentRowPosition);
                 Console.ForegroundColor = color;
-                Console.Write(input.InputLabel);
-                Console.SetCursorPosition(inputFieldMarkerPosition, rowPosition); 
-                Console.Write($" {m_InputFieldMarker} ");
-                // Set position of input
-                input.SetValueInputPosition(Console.CursorLeft, Console.CursorTop);
-                Console.ResetColor(); 
-                rowPosition++;
+                Console.Write(item.InputLabel);
+                Console.SetCursorPosition(longestInputLabel + justification + 1, currentRowPosition);
+                Console.Write(m_InputFieldMarker);
+                item.SetValueInputPosition(Console.CursorLeft, Console.CursorTop);
+                currentRowPosition += 1; 
+            }
+        }
+
+        public void TakeAllInputValues(ConsoleColor inputColor, StatusCallback? statusCallback = null, bool storeAsUppercase = false)
+        {
+            foreach(Input input in m_Inputs)
+            {
+                TakeInputValue(input.IdentifierID, inputColor, statusCallback, storeAsUppercase); 
             }
         }
 
         public void TakeInputValue(string identifier, ConsoleColor inputColor, StatusCallback? statusCallback = null, bool storeUppercase = false)
         {
             var value = m_Inputs.Where(i => i.IdentifierID == identifier).FirstOrDefault();
-            if(value is not null)
+            if (value is not null)
             {
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
                 Console.ForegroundColor = inputColor;
                 string inputValue = Console.ReadLine() ?? string.Empty;
                 if (storeUppercase)
-                    inputValue = inputValue.ToUpper(); 
+                    inputValue = inputValue.ToUpper();
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
                 Console.Write("".PadRight(inputValue.Length));
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
                 Console.Write(inputValue);
-                value.SetInputValue(inputValue); 
+                value.SetInputValue(inputValue);
+                statusCallback?.Invoke($"VALUE ACCEPTED: {inputValue}");
             }
+            else
+                statusCallback?.Invoke($"VALUE NOT ACCEPTED: INPUT WAS NULL"); 
         }
 
         private int FindLongestPromptLine()

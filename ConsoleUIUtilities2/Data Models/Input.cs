@@ -11,6 +11,7 @@
         public Input(string identifierID)
         {
             IdentifierID = identifierID;
+            InputLabel = IdentifierID.ToUpper();
         }
 
         public void SetInputLabel(string label)

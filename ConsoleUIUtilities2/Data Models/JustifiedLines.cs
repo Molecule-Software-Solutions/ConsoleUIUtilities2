@@ -1,6 +1,6 @@
 ﻿namespace ConsoleUIUtilities2
 {
-    internal class JustifiedLines
+    public class JustifiedLines
     {
         private List<string> m_ListOfStrings = new List<string>();
 
