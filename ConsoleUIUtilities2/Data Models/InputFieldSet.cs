@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConsoleUIUtilities2
+﻿namespace ConsoleUIUtilities2
 {
     public class InputFieldSet
     {
@@ -80,6 +74,29 @@ namespace ConsoleUIUtilities2
             foreach(Input input in m_Inputs)
             {
                 TakeInputValue(input.IdentifierID, inputColor, statusCallback, storeAsUppercase); 
+            }
+        }
+
+        public void ClearAndRetakeValue(string identifier, ConsoleColor valueColor = ConsoleColor.White, StatusCallback? statusCallback = null)
+        {
+            var result = m_Inputs.Where(i => i.IdentifierID == identifier).FirstOrDefault();
+            if(result is not null)
+            {
+                Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
+                Console.Write("".PadRight(result.InputValue.Length));
+                TakeInputValue(identifier, valueColor, statusCallback); 
+            }
+        }
+
+        public void ClearAndRewriteValue(string identifier, ConsoleColor valueColor = ConsoleColor.White)
+        {
+            var result = m_Inputs.Where(i => i.IdentifierID == identifier).FirstOrDefault(); 
+            if(result is not null)
+            {
+                Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
+                Console.Write("".PadRight(result.InputValue.Length));
+                Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
+                Console.Write(result.InputValue); 
             }
         }
 
