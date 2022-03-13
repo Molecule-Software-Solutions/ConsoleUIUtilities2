@@ -59,17 +59,31 @@
         }
 
         public void ShowAndLoadMenu(int headerRow = 0,
-            int menuStartRow = 5,
+            int menuStartRow = 6,
             int menuJustification = 15,
+            string menuHeaderText = "",
             ConsoleColor menuItemColor = ConsoleColor.White,
             ConsoleColor headerLineColor = ConsoleColor.White,
             ConsoleColor headerTextColor = ConsoleColor.White,
             ConsoleColor callbackMessageColor = ConsoleColor.White,
             ConsoleColor callbackLineColor = ConsoleColor.White,
-            ConsoleColor callbackPromptColor = ConsoleColor.White)
+            ConsoleColor callbackPromptColor = ConsoleColor.White,
+            bool onMenuBreakCallPageRedraw = false)
         {
-            Header?.WriteHeader(headerRow, headerLineColor, headerTextColor); 
-            Menu?.BeginMenuLoop(menuStartRow, menuJustification, menuItemColor, callbackMessageColor, callbackLineColor, callbackPromptColor); 
+            Console.Clear(); 
+            Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            Menu?.BeginMenuLoop(
+                menuStartRow,
+                menuJustification,
+                menuHeaderText,
+                menuItemColor,
+                callbackMessageColor,
+                callbackLineColor,
+                callbackPromptColor, () =>
+            {
+                Console.Clear();
+                Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            }, InvalidMenuSelectionNotice, onMenuBreakCallPageRedraw); 
         }
 
         public void ShowAndLoadInputs(int headerRow = 0,
@@ -84,6 +98,7 @@
             ConsoleColor callbackPromptColor = ConsoleColor.White, 
             bool collectValuesAsAllUppercase = false)
         {
+            Console.Clear(); 
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
             InputFieldSet?.WriteMultipleInputs(inputStartRow, inputJustification, inputPromptTextColor);
             InputFieldSet?.TakeAllInputValues(inputValueTextColor, (cb) =>
@@ -95,6 +110,11 @@
         public void Close(CloseCallback closeCallback)
         {
             closeCallback.Invoke(); 
+        }
+
+        private void InvalidMenuSelectionNotice()
+        {
+            NotificationLine.WriteNotificationLine("INVALID KEY PRESSED", ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.White, "NOTICE");
         }
 
         public delegate void CloseCallback(); 

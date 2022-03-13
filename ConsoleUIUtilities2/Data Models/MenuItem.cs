@@ -3,7 +3,7 @@
     public class MenuItem
     {
         public string MenuItemText { get; set; } = string.Empty;
-        public ConsoleKey[] MenuItemTriggerKey { get; set; }
+        public ConsoleKey[] MenuItemTriggerKeys { get; set; }
         public Action? MenuItemCommand { get; set; } = null;
 
         public MenuItem() : this("", Array.Empty<ConsoleKey>(), () => { }) { }
@@ -11,8 +11,13 @@
         public MenuItem(string menuItemText, ConsoleKey[] menuItemTriggerKey, Action menuItemCommand)
         {
             MenuItemText = menuItemText;
-            MenuItemTriggerKey = menuItemTriggerKey;
+            MenuItemTriggerKeys = menuItemTriggerKey;
             MenuItemCommand = menuItemCommand;
+        }
+
+        public void SetMenuTriggerKeys(ConsoleKey[] keys)
+        {
+            MenuItemTriggerKeys = keys;
         }
 
         public void PrintMenuItem(int row, int justification = 0, ConsoleColor color = ConsoleColor.White)
