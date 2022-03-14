@@ -57,10 +57,12 @@ namespace Testing
             thirdChoice.SetMenuItemText("3) THIRD CHOICE"); 
             thirdChoice.SetMenuItemCommand(() =>
             {
-                Console.Clear();
-                Console.WriteLine("Third Choice Selected");
-                Console.WriteLine("Press ENTER to contimue");
-                Console.ReadLine();
+                Dialog dialog = new Dialog("Test Title", Lorem.LOREM_LONG_STRING);
+                dialog.Show('=', ConsoleColor.Yellow, ConsoleColor.Cyan, ConsoleColor.White);
+                dialog.Close(() =>
+                {
+                    ConsoleBufferSystem.WriteBuffer();
+                });
             }); 
             thirdChoice.SetMenuTriggerKeys(new ConsoleKey[] {ConsoleKey.D3, ConsoleKey.NumPad3 });
 
@@ -75,7 +77,6 @@ namespace Testing
                 }); 
             });
             fourthChoice.SetMenuTriggerKeys(new ConsoleKey[] { ConsoleKey.D4, ConsoleKey.NumPad4 });
-
 
             // Fill Menu
             applicationMenu.AddMenuItemRange(new MenuItem[] {firstChoice, secondChoice, thirdChoice, fourthChoice});
