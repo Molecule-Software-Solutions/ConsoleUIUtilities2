@@ -3,20 +3,30 @@ namespace ConsoleUIUtilities2
     public static class ConsoleBufferSystem
     {
         private static List<BufferObject> BufferedObjects = new List<BufferObject>();
+        private static int m_CursorLeft;
+        private static int m_CursorTop; 
 
         public static void ClearBuffer()
         {
             BufferedObjects.Clear();
             Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            CursorStateCapture(); 
         }
 
+        private static void CursorStateCapture()
+        {
+            m_CursorLeft = Console.CursorLeft;
+            m_CursorTop = Console.CursorTop; 
+        }
         public static void Write(string text, ConsoleColor textColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
         {
             BufferedObjects.Add(new BufferObject() { Text = text, TextColor = textColor, BackgroundColor = backgroundColor, StartTop = Console.CursorTop, StartLeft = Console.CursorLeft, WriteMethod = BufferLineWriteMethods.Write });
             Console.ForegroundColor = textColor;
             Console.BackgroundColor = backgroundColor;
             Console.Write(text);
-            Console.ResetColor(); 
+            Console.ResetColor();
+            CursorStateCapture(); 
         }
 
         public static void WriteLine(string text, ConsoleColor textColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
@@ -25,7 +35,8 @@ namespace ConsoleUIUtilities2
             Console.ForegroundColor = textColor;
             Console.BackgroundColor = backgroundColor;
             Console.WriteLine(text);
-            Console.ResetColor(); 
+            Console.ResetColor();
+            CursorStateCapture(); 
         }
 
         public static void WriteBuffer()
@@ -53,6 +64,7 @@ namespace ConsoleUIUtilities2
                         break;
                 }
             }
+            Console.SetCursorPosition(m_CursorLeft, m_CursorTop); 
         }
     }
 }

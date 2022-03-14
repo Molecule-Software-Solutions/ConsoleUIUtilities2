@@ -83,7 +83,9 @@
             {
                 ConsoleBufferSystem.ClearBuffer();
                 Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
-            }, InvalidMenuSelectionNotice, onMenuBreakCallPageRedraw); 
+            }, 
+            InvalidMenuSelectionNotice, 
+            onMenuBreakCallPageRedraw); 
         }
 
         public void ShowAndLoadInputs(int headerRow = 0,
