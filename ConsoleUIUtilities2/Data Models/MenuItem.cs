@@ -23,11 +23,9 @@
         public void PrintMenuItem(int row, int justification = 0, ConsoleColor color = ConsoleColor.White)
         {
             Console.SetCursorPosition(justification, row);
-            Console.Write("".PadRight(Console.WindowWidth - justification, ' '));
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth - justification, ' '));
             Console.SetCursorPosition(justification, row);
-            Console.ForegroundColor = color;
-            Console.Write(MenuItemText);
-            Console.ResetColor(); 
+            ConsoleBufferSystem.Write(MenuItemText, color);
         }
 
         public void SetMenuItemText(string text)

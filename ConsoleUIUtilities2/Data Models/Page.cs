@@ -1,6 +1,6 @@
 ﻿namespace ConsoleUIUtilities2
 {
-    public class Page
+    public abstract class Page
     {
         public string? Title { get; private set; }
         public Header? Header { get; private set; }
@@ -44,7 +44,7 @@
 
         public void ShowPageOnly(int headerRow = 0, ConsoleColor headerLineColor = ConsoleColor.White, ConsoleColor headerTextColor = ConsoleColor.White)
         {
-            Console.Clear(); 
+            ConsoleBufferSystem.ClearBuffer(); 
             if(Header is not null)
             {
                 Header.WriteHeader(headerRow, headerLineColor, headerTextColor); 
@@ -70,7 +70,7 @@
             ConsoleColor callbackPromptColor = ConsoleColor.White,
             bool onMenuBreakCallPageRedraw = false)
         {
-            Console.Clear(); 
+            ConsoleBufferSystem.ClearBuffer(); 
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
             Menu?.BeginMenuLoop(
                 menuStartRow,
@@ -81,7 +81,7 @@
                 callbackLineColor,
                 callbackPromptColor, () =>
             {
-                Console.Clear();
+                ConsoleBufferSystem.ClearBuffer();
                 Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
             }, InvalidMenuSelectionNotice, onMenuBreakCallPageRedraw); 
         }
@@ -98,7 +98,7 @@
             ConsoleColor callbackPromptColor = ConsoleColor.White, 
             bool collectValuesAsAllUppercase = false)
         {
-            Console.Clear(); 
+            ConsoleBufferSystem.ClearBuffer(); 
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
             InputFieldSet?.WriteMultipleInputs(inputStartRow, inputJustification, inputPromptTextColor);
             InputFieldSet?.TakeAllInputValues(inputValueTextColor, (cb) =>
@@ -107,9 +107,9 @@
             }, collectValuesAsAllUppercase); 
         }
 
-        public void Close(CloseCallback closeCallback)
+        public void Close(Action closeCallback)
         {
-            closeCallback.Invoke(); 
+            closeCallback(); 
         }
 
         private void InvalidMenuSelectionNotice()
@@ -117,6 +117,7 @@
             NotificationLine.WriteNotificationLine("INVALID KEY PRESSED", ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.White, "NOTICE");
         }
 
-        public delegate void CloseCallback(); 
+        public abstract void InitComponent();
+        protected abstract void BuildComponent(); 
     }
 }

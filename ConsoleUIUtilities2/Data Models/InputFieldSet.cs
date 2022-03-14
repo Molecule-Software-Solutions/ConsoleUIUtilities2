@@ -44,9 +44,7 @@
             if (value is not null)
             {
                 Console.SetCursorPosition(justification, row); 
-                Console.ForegroundColor = color;
-                Console.Write(value.InputLabel);
-                Console.ResetColor(); 
+                ConsoleBufferSystem.Write(value.InputLabel, color);
             }
             else
                 statusCallback?.Invoke("Input does not exist"); 
@@ -60,10 +58,9 @@
             foreach (Input item in m_Inputs)
             {
                 Console.SetCursorPosition(justification, currentRowPosition);
-                Console.ForegroundColor = color;
-                Console.Write(item.InputLabel);
+                ConsoleBufferSystem.Write(item.InputLabel, color);
                 Console.SetCursorPosition(longestInputLabel + justification + 1, currentRowPosition);
-                Console.Write(m_InputFieldMarker);
+                ConsoleBufferSystem.Write(m_InputFieldMarker, color);
                 item.SetValueInputPosition(Console.CursorLeft, Console.CursorTop);
                 currentRowPosition += 1; 
             }
@@ -83,7 +80,7 @@
             if(result is not null)
             {
                 Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
-                Console.Write("".PadRight(result.InputValue.Length));
+                ConsoleBufferSystem.Write("".PadRight(result.InputValue.Length));
                 TakeInputValue(identifier, valueColor, statusCallback); 
             }
         }
@@ -94,9 +91,9 @@
             if(result is not null)
             {
                 Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
-                Console.Write("".PadRight(result.InputValue.Length));
+                ConsoleBufferSystem.Write("".PadRight(result.InputValue.Length));
                 Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
-                Console.Write(result.InputValue); 
+                ConsoleBufferSystem.Write(result.InputValue); 
             }
         }
 
@@ -106,14 +103,13 @@
             if (value is not null)
             {
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
-                Console.ForegroundColor = inputColor;
                 string inputValue = Console.ReadLine() ?? string.Empty;
                 if (storeUppercase)
                     inputValue = inputValue.ToUpper();
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
-                Console.Write("".PadRight(inputValue.Length));
+                Console.Write("".PadRight(inputValue.Length), inputColor);
                 Console.SetCursorPosition(value.InputValueStartPositionColumn, value.InputValueStartPositionRow);
-                Console.Write(inputValue);
+                ConsoleBufferSystem.Write(inputValue, inputColor);
                 value.SetInputValue(inputValue);
                 statusCallback?.Invoke($"VALUE ACCEPTED: {inputValue}");
             }

@@ -11,9 +11,7 @@ namespace ConsoleUIUtilities2
         public static void WriteHorizontalLine(char lineCharacter, int row, ConsoleColor color = ConsoleColor.White)
         {
             Console.SetCursorPosition(0, row);
-            Console.ForegroundColor = color; 
-            Console.Write("".PadRight(Console.WindowWidth, lineCharacter));
-            Console.ResetColor(); 
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, lineCharacter), color);
         }
     }
 }

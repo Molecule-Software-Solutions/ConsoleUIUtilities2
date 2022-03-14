@@ -7,9 +7,7 @@
         public static void WriteJustifiedLine(string text, int justification, int row, ConsoleColor color = ConsoleColor.White)
         {
             Console.SetCursorPosition(justification, row);
-            Console.ForegroundColor = color;
-            Console.Write(text);
-            Console.ResetColor();
+            ConsoleBufferSystem.Write(text, color);
         }
 
         public void WriteMultipleJustifiedLines(int justification, int startRow, ConsoleColor color = ConsoleColor.White)
@@ -19,9 +17,7 @@
             foreach (string line in m_ListOfStrings)
             {
                 Console.SetCursorPosition(justification, rowPosition);
-                Console.ForegroundColor = color;
-                Console.Write(line);
-                Console.ResetColor(); 
+                ConsoleBufferSystem.Write(line, color);
                 rowPosition++;
             }
         }

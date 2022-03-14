@@ -45,10 +45,9 @@ namespace ConsoleUIUtilities2
         private ConsoleKey TakeMenuSelection(int startRow, int justification, ConsoleColor promptColor = ConsoleColor.White)
         {
             Console.SetCursorPosition(0, startRow);
-            Console.Write("".PadRight(Console.WindowWidth, ' '));
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, ' '));
             Console.SetCursorPosition(justification, startRow);
-            Console.ForegroundColor = promptColor;
-            Console.Write("Please enter your selection >> ");
+            ConsoleBufferSystem.Write("Please enter your selection >> ", promptColor);
             return Console.ReadKey().Key;
         }
 
@@ -65,7 +64,7 @@ namespace ConsoleUIUtilities2
             ConsoleColor callbackLineColor = ConsoleColor.White, 
             ConsoleColor callbackPromptColor = ConsoleColor.White,
             Action? redrawAction = null,
-            InvalidMenuSelectionCallback? invalidMenuSelectionCallback = null, 
+            Action? invalidMenuSelectionCallback = null, 
             bool onMenuBreakCallRedraw = false)
         {
             while (!m_MenuBreakToken)
@@ -99,7 +98,5 @@ namespace ConsoleUIUtilities2
                 }
             }
         }
-
-        public delegate void InvalidMenuSelectionCallback(); 
     }
 }

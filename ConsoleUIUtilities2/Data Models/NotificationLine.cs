@@ -17,24 +17,21 @@ namespace ConsoleUIUtilities2
         {
             int writePosition = Console.WindowHeight - 1;
             ClearNotificationLine();
-            Console.ForegroundColor = notificationLineColor; 
             Console.SetCursorPosition(0, writePosition - 1);
-            Console.Write("".PadRight(Console.WindowWidth, '-'));
-            Console.ForegroundColor = notificationLineMessageColor; 
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, '-'), notificationLineColor);
             Console.SetCursorPosition(5, writePosition - 1);
-            Console.Write($"[ {notificationLineText} ]");
-            Console.ForegroundColor = color;
+            ConsoleBufferSystem.Write($"[ {notificationLineText} ]", notificationLineMessageColor);
             Console.SetCursorPosition(0, writePosition);
-            Console.Write(line); 
+            ConsoleBufferSystem.Write(line, color); 
         }
 
         public static void ClearNotificationLine()
         {
             int writePosition = Console.WindowHeight - 1;
             Console.SetCursorPosition(0, writePosition - 1);
-            Console.Write("".PadRight(Console.WindowWidth, ' '));
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, ' '));
             Console.SetCursorPosition(0, writePosition);
-            Console.Write("".PadRight(Console.WindowWidth, ' '));
+            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, ' '));
         }
     }
 }
