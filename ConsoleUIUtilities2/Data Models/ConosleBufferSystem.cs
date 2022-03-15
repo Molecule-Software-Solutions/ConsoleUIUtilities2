@@ -14,6 +14,12 @@ namespace ConsoleUIUtilities2
             CursorStateCapture(); 
         }
 
+        public static void SetCursorPosition(int cursorLeft, int cursorTop)
+        {
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            CursorStateCapture(); 
+        }
+
         private static void CursorStateCapture()
         {
             m_CursorLeft = Console.CursorLeft;
