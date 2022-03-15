@@ -1,4 +1,6 @@
-﻿namespace ConsoleUIUtilities2
+﻿using System.Linq; 
+
+namespace ConsoleUIUtilities2
 {
     public class InputFieldSet
     {
@@ -128,6 +130,16 @@
                 }
             }
             return length; 
+        }
+
+        public string GetValue(string identifierID)
+        {
+            var result = m_Inputs.Where(i => i.IdentifierID == identifierID).FirstOrDefault(); 
+            if(result is not null)
+            {
+                return result.InputValue; 
+            }
+            return string.Empty; 
         }
 
         #region Delegates

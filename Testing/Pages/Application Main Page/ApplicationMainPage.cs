@@ -6,27 +6,41 @@ namespace Testing
 {
     public class ApplicationMainPage : Page
     {
+        /// <summary>
+        /// The constructor for the page should call the base constructor.
+        /// Note that the base constructor can take in optional parameters to
+        /// set up the page without extensive use of the builder. 
+        /// The method signature for Page's constructor is as follows ::: 
+        /// Page(string title = "", Header? header = null, InputFieldSet? inputFieldSet = null, Menu? menu = null)
+        /// </summary>
         public ApplicationMainPage() : base()
         {
             InitComponent(); 
         }
 
+        /// <summary>
+        /// The BuildComponent method can be used to construct the page.
+        /// The default behavior for the builder is { } and overriding this method
+        /// is optional, but the InitComponent method automatically calls the builder
+        /// </summary>
         protected override void BuildComponent()
         {
-            // Header
+            // Create Header
             Header header = new Header();
             header.SetTopAndBottomLineChars('=');
+
+            // Add header lines
             header.AddHeaderLine("MOLECULE SOFTWARE SOLUTIONS");
             header.AddHeaderLine("(C) 2022 - CONSOLE UTILITIES 2 TEST APPLICATION");
             header.AddHeaderLine("V. 1.0.0.0");
 
-            // Add Header
+            // Add Headerto page
             SetHeader(header); 
 
-            // Application Menu
+            // Create a Menu
             Menu applicationMenu = new Menu();
 
-            // Application Menu Items
+            // Add Menu Items
             MenuItem firstChoice = new MenuItem();
             MenuItem secondChoice = new MenuItem();
             MenuItem thirdChoice = new MenuItem();
@@ -84,21 +98,42 @@ namespace Testing
                 // Read a line to hold the screen
                 Console.ReadLine(); 
             });
+            // Set the trigger keys that will call this menu option
+            // NOTE: If a duplicate trigger key is set, the default behavior is 
+            // that the first menu item with that trigger key will be called.
+            // AVOID duplicating triggers to prevent unwanted behavior
             firstChoice.SetMenuTriggerKeys(new ConsoleKey[] { ConsoleKey.D1, ConsoleKey.NumPad1 });
 
+            // Continue setting up menu items
             secondChoice.SetMenuItemText("2) SHOW INPUTS"); 
-            secondChoice.SetMenuItemCommand(async () =>
+
+            // This menu item demonstrates calling the input fields into action
+            secondChoice.SetMenuItemCommand(() =>
             {
                 ShowAndLoadInputs(0, 6, 15, ConsoleColor.Blue, ConsoleColor.Yellow, ConsoleColor.Yellow, ConsoleColor.Cyan, ConsoleColor.Yellow, ConsoleColor.Blue, ConsoleColor.White, true);
+                // Normally you would perform some sort of validation or 
+                // verification action with the inputs, then deal with them in some way
+                // here. 
+                // Sample to get values: InputFieldSet.GetValue("2) SHOW INPUTS"); 
+                // NOTE: The default behavior, unless you manually set the identifierID, is
+                // for the system to accept the field's text as the identifier. 
+                // FURTHER NOTE: You may also directly access the field's value by accessing the
+                // field's InputValue property if this is easier. 
                 Console.ReadLine(); 
             });
+            // Again adding trigger keys
             secondChoice.SetMenuTriggerKeys(new ConsoleKey[] { ConsoleKey.D2, ConsoleKey.NumPad2 });
 
+            // This shows an example of how to properly call a dialog.
             thirdChoice.SetMenuItemText("3) SHOW DIALOG"); 
             thirdChoice.SetMenuItemCommand(() =>
             {
+                // NOTE: the test application contains a class called Lorem which
+                // creates sample text to fill the dialog
                 Dialog dialog = new Dialog("Test Title", Lorem.LOREM_LONG_STRING);
+                // set up and show the dialog
                 dialog.Show('=', ConsoleColor.Yellow, ConsoleColor.Cyan, ConsoleColor.White);
+                // Close the dialog and handle the close call with a callback anan method. 
                 dialog.Close(() =>
                 {
                     ConsoleBufferSystem.WriteBuffer();
@@ -106,6 +141,8 @@ namespace Testing
             }); 
             thirdChoice.SetMenuTriggerKeys(new ConsoleKey[] {ConsoleKey.D3, ConsoleKey.NumPad3 });
 
+            // This is an example of how to close an application using the page's 
+            // close callback anon method. 
             fourthChoice.SetMenuItemText("4) EXIT APPLICATION"); 
             fourthChoice.SetMenuItemCommand(() =>
             {
@@ -143,6 +180,9 @@ namespace Testing
             SetInputFieldSet(applicationInputs); 
 
             // Show the page
+            // NOTE: Most of the parameters are optioanl here but assist with the visual
+            // setup of the page. Inline documentation can assist with this setup, but it
+            // mostly consists of item placements and colorations
             ShowAndLoadMenu(
                 0,
                 6,
@@ -156,6 +196,10 @@ namespace Testing
                 ConsoleColor.Yellow); 
         }
 
+        // NOTE: This override is not necessary to perform a simple Init
+        // but it demonstrates how additional code can be added to the init command. 
+        // Just make sure to call the BuildComponent method at some point if the InitComponent
+        // method is overridden. 
         public override void InitComponent()
         {
             // Call builder

@@ -40,6 +40,7 @@
             Header = header;
             InputFieldSet = inputFieldSet;
             Menu = menu;
+            InitComponent();
         }
 
         public void ShowPageOnly(int headerRow = 0, ConsoleColor headerLineColor = ConsoleColor.White, ConsoleColor headerTextColor = ConsoleColor.White)
@@ -119,7 +120,15 @@
             NotificationLine.WriteNotificationLine("INVALID KEY PRESSED", ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.White, "NOTICE");
         }
 
-        public abstract void InitComponent();
-        protected abstract void BuildComponent(); 
+        public virtual void InitComponent()
+        {
+            BuildComponent(); 
+        }
+        protected virtual void BuildComponent() {}
+
+        public virtual string GetInputValue(string identifierID)
+        {
+            return InputFieldSet?.GetValue(identifierID) ?? string.Empty; 
+        }
     }
 }
