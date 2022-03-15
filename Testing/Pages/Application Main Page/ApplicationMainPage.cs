@@ -39,9 +39,49 @@ namespace Testing
             firstChoice.SetMenuItemText("1) FIRST CHOICE");
             firstChoice.SetMenuItemCommand(() =>
             {
+                // Clear and buffer enables a user to clear the screen while preserving the state since the last clear
+                // while this feature can become slow if many elements have been loaded or changed, it will allow the 
+                // previous content to be displayed easily. 
+
+                // Clears the screen content and resets the buffer
+                ConsoleBufferSystem.ClearBuffer();
+
+                // Write some line to the console window
+                JustifiedLines.WriteJustifiedLine("First menu item selected", 15, 2, ConsoleColor.Yellow);
+                JustifiedLines.WriteJustifiedLine("Press ENTER to clear the screen", 15, 3, ConsoleColor.Cyan);
+                Console.ReadLine();
+
+                /*
+                 * NOTE: When the console cursor is moved into a position prior to clearing manually, recalling the
+                 * previous buffered state will reset the cursor into the previously held position.
+                 * This can only be done by writing with one of the ConsoleUIUtilities2 objects or by calling
+                 * ConsoleBufferSystem.SetCursorPosition(0, 0) method. 
+                 */
+
+                // To clear the screen without a buffer reset, call Console.Clear() as normal
                 Console.Clear();
-                Console.WriteLine("First Choice Selected");
-                Console.WriteLine("Press ENTER to contimue");
+
+                // To write to the console, call normal write commands
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Press ENTER to reset the page"); 
+                Console.ReadLine();
+
+                // Once enter is pressed then the console buffer should be redrawn
+                ConsoleBufferSystem.WriteBuffer();
+
+                // We can now add lines from where we left off... notice the optional text formatting available 
+                // this new function begins writing from the last point the cursor was located before the standard console clear
+                // so we have added special formatting to highlight the changes. 
+                ConsoleBufferSystem.WriteLine("The buffer has now been redrawn and this line was added", ConsoleColor.Magenta, ConsoleColor.DarkBlue);
+
+                // Here is another line with one of the optional text formatting options modified. 
+                // Note that writeline works much like Console.WriteLine and will position the cursor at 0,0
+                ConsoleBufferSystem.WriteLine("Press ENTER to continue", ConsoleColor.Yellow);
+
+                // To write a justified line that is the same, use the JustifiedLine class.
+                JustifiedLines.WriteJustifiedLine("Press ENTER to continue (now this is justified properly)", 15, 10, ConsoleColor.Cyan); 
+
+                // Read a line to hold the screen
                 Console.ReadLine(); 
             });
             firstChoice.SetMenuTriggerKeys(new ConsoleKey[] { ConsoleKey.D1, ConsoleKey.NumPad1 });
@@ -80,7 +120,7 @@ namespace Testing
             applicationMenu.AddMenuItemRange(new MenuItem[] {firstChoice, secondChoice, thirdChoice, fourthChoice});
 
             // Input Items
-            InputFieldSet applicaitonInputs = new InputFieldSet();
+            InputFieldSet applicationInputs = new InputFieldSet();
 
             // Create inputs
             Input personName = new Input("personName");
@@ -92,8 +132,15 @@ namespace Testing
             personAddress.SetInputLabel("ADDRESS");
             personCity.SetInputLabel("CITY");
 
+            // Set the input field marker * This can be any string to denote the beginning of the field
+            // it is suggested to add a space at the end of the marker
+            applicationInputs.SetInputFieldMarker(">> "); 
+
+            // Add inputs to input field set
+            applicationInputs.AddInputRange(new Input[] {personName, personAddress, personCity});
+
             // Add inputs to page
-            SetInputFieldSet(applicaitonInputs); 
+            SetInputFieldSet(applicationInputs); 
 
             // Show the page
             ShowAndLoadMenu(
