@@ -6,12 +6,27 @@ namespace ConsoleUIUtilities2
         private string m_Title;
         private readonly int m_StartHeight = (Console.WindowHeight / 2) - 10;
         private readonly int m_EndHeight = (Console.WindowHeight / 2) + 10;
+
+        /// <summary>
+        /// Message screen for presenting messages and errors to the user
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
         public Dialog(string title, string message)
         {
             m_Message = message;
             m_Title = title;
         }
 
+        /// <summary>
+        /// Shows the dialog on the console screen. Note that the dialog window will clear the area
+        /// under the dialog. Use ConsoleBufferSystem.WriteBuffer() method to restore the original console content prior to
+        /// displaying the dialog. 
+        /// </summary>
+        /// <param name="frameLineChar">Character used to generate the dialog frame</param>
+        /// <param name="dialogFrameColor">Frame color</param>
+        /// <param name="consoleTitleColor">title text color</param>
+        /// <param name="consoleMessageColor">message color</param>
         public void Show(char frameLineChar = '-', ConsoleColor dialogFrameColor = ConsoleColor.White, ConsoleColor consoleTitleColor = ConsoleColor.White, ConsoleColor consoleMessageColor = ConsoleColor.White)
         {
             // Clear the dialog area
@@ -70,6 +85,11 @@ namespace ConsoleUIUtilities2
             while (Console.ReadKey().Key != ConsoleKey.Enter) { }
         }
 
+        /// <summary>
+        /// Closes the dialog message. NOTE: This only performs a clear of the console. To restore
+        /// the buffered content you will need to call ConsoleBufferSystem.WriteBuffer() method. 
+        /// </summary>
+        /// <param name="closeAction">Action to be performed upon dialog closure</param>
         public void Close(Action closeAction)
         {
             Console.Clear();
