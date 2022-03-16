@@ -202,11 +202,11 @@ namespace Testing
         // method is overridden. 
         public override void InitComponent()
         {
-            // Call builder
-            BuildComponent();
+            // Fill any models or perform any other non-GUI work here
+            // <  >
 
-            // Call any additional code to modify the page here
-            // {}
+            // Call builder last
+            BuildComponent();
         }
     }
 }

@@ -4,6 +4,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>MoleculeSoftware.Packages.ConsoleUIUtilities2</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Joshua H. Santiago</Authors>
+    <Company>Molecule Software Solutions</Company>
+    <Product>ConsoleUIUtilities2</Product>
+    <Description>A simple Text User Interface (TUI) framework for producing console applications. TUI is a text based graphical user interface (GUI)</Description>
+    <Copyright>2022 Molecule Software Solutions</Copyright>
+    <PackageReleaseNotes>BETA - This product is still in the beta phase of construction but is complete enough to create a Console Text Based User Interface (TUI) application. Full functionality without bugs is not warranteed</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/joshman1019/ConsoleUIUtilities2</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/joshman1019/ConsoleUIUtilities2</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
