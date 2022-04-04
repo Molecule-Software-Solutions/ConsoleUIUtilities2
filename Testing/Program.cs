@@ -7,9 +7,20 @@ namespace Testing
     {
         public static void Main()
         {
-            // Application Main Page
-            ApplicationMainPage applicationMainPage = new ApplicationMainPage();
-            applicationMainPage.ShowAndLoadMenu(0, 6, 15, "MAIN MENU", ConsoleColor.Yellow, ConsoleColor.Cyan, ConsoleColor.Yellow, ConsoleColor.White, ConsoleColor.Blue, ConsoleColor.White, false); 
+            Header testHeader = new Header();
+            testHeader.AddHeaderLine("2022 Test Application");
+            testHeader.AddHeaderLine("Molecule Software Systems");
+            testHeader.SetTopAndBottomLineChars('*'); 
+            SelectionMenu<int> menu = new SelectionMenu<int>();
+
+
+            for (int i = 0; i < 30; i++)
+            {
+                menu.AddSelectionItem(new SelectionItem<int>($"Test{i}", i)); 
+            }
+
+
+            menu.DrawSelectionScreen("SELECT AN ITEM", '/', ConsoleColor.Yellow, true, testHeader);
             Console.ReadLine(); 
         }
     }
