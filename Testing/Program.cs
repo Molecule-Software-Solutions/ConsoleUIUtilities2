@@ -11,7 +11,27 @@ namespace Testing
             testHeader.AddHeaderLine("2022 Test Application");
             testHeader.AddHeaderLine("Molecule Software Systems");
             testHeader.SetTopAndBottomLineChars('*'); 
-            Console.ReadLine(); 
+            Console.ReadLine();
+
+            List<int> testList = new List<int>(); 
+            for (int i = 0; i < 140; i++)
+            {
+                testList.Add(i); 
+            }
+            SelectionMenu<int> menu = new SelectionMenu<int>(6, 25, () =>
+            {
+
+            }, () =>
+            {
+
+            }); 
+
+            foreach (int item in testList)
+            {
+                menu.AddItem(item, $"TEST {item}");
+            }
+
+            menu.PrintItemSelection(ConsoleColor.Yellow, ConsoleColor.DarkCyan, new Header());
         }
     }
 }
