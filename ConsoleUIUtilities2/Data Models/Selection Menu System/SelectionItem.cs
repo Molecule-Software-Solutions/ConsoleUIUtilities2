@@ -2,14 +2,49 @@ namespace ConsoleUIUtilities2;
 
 public class SelectionItem<T>
 {
+    /// <summary>
+    /// The item stored within the <see cref="SelectionItem{T}"/> with <see cref="T"/> being any type
+    /// </summary>
     public T Item { get; private set; }
+
+    /// <summary>
+    /// The caption that will be printed on the <see cref="SelectionMenu{T}"/> so that users will kow what they are selecting
+    /// </summary>
     public string Caption { get; private set; }
-    public int ItemRow { get; set; }
-    public int ItemColumn { get; set; }
-    public int ItemPage { get; set; }
+
+    /// <summary>
+    /// The row that the item will be placed on
+    /// </summary>
+    public int ItemRow { get; private set; }
+
+    /// <summary>
+    /// The column that the item will be placed on
+    /// </summary>
+    public int ItemColumn { get; private set; }
+
+    /// <summary>
+    /// The page that the item will be placed on
+    /// </summary>
+    public int ItemPage { get; private set; }
+
+    /// <summary>
+    /// Returns the length of the caption
+    /// </summary>
     public int CaptionLength => Caption.Length;
+
+    /// <summary>
+    /// The color of the item
+    /// </summary>
     public ConsoleColor ItemColor { get; private set; }
+
+    /// <summary>
+    /// The color of the item when the selection highlight is activated
+    /// </summary>
     public ConsoleColor SelectionForeColor { get; private set; }
+
+    /// <summary>
+    /// The color of the selection highlight
+    /// </summary>
     public ConsoleColor SelectionBackColor { get; private set; }
 
     /// <summary>
@@ -21,9 +56,16 @@ public class SelectionItem<T>
         return Item;
     }
 
+    /// <summary>
+    /// Writes the item to the console in the position calculated by the <see cref="SelectionMenu{T}"/>
+    /// </summary>
+    /// <param name="rowOffset"></param>
+    /// <param name="columnOffset"></param>
+    /// <param name="selected"></param>
     public void WriteItem(int rowOffset, int columnOffset, bool selected = false)
     {
         Console.ResetColor(); 
+        // If currently selected
         if(selected)
         {
             Console.ForegroundColor = SelectionForeColor;
@@ -33,13 +75,21 @@ public class SelectionItem<T>
             Console.ResetColor();
             return; 
         }
+        // Else if not currently selected
         Console.ForegroundColor = ItemColor;
         Console.SetCursorPosition(columnOffset * ItemColumn, rowOffset + ItemRow);
         Console.Write($"  {Caption}  ");
         Console.ResetColor();
-        return;
     }
 
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    /// <param name="selectionItem">Item that will be stored for selection</param>
+    /// <param name="caption">Caption that will appear on the <see cref="SelectionMenu{T}"/></param>
+    /// <param name="itemColor">Color of the item as it will appear on the <see cref="SelectionMenu{T}"/></param>
+    /// <param name="selectionForeColor">Color of the item when it is highlighted by the selector</param>
+    /// <param name="selectionBackColor">Color of the selector that will highlight the item when it is selected</param>
     public SelectionItem(T selectionItem, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionForeColor = ConsoleColor.Black, ConsoleColor selectionBackColor = ConsoleColor.DarkCyan)
     {
         Item = selectionItem;

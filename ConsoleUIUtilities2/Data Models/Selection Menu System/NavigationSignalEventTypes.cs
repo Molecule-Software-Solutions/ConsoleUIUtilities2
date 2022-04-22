@@ -1,5 +1,8 @@
 namespace ConsoleUIUtilities2;
 
+/// <summary>
+/// Navigation signals that can be sent to the consumer
+/// </summary>
 public enum NavigationSignalEventTypes
 {
     NONE,
