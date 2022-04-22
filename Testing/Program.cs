@@ -28,10 +28,10 @@ namespace Testing
 
             foreach (int item in testList)
             {
-                menu.AddItem(item, $"TEST {item}");
+                menu.AddItem(item, $"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG {item}");
             }
 
-            menu.PrintItemSelection(ConsoleColor.Yellow, ConsoleColor.DarkCyan, new Header());
+            menu.PrintItemSelection();
         }
     }
 }
