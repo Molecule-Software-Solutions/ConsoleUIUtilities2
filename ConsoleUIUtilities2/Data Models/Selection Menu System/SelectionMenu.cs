@@ -101,16 +101,31 @@ public class SelectionMenu<T>
         m_BreakMenu = true; 
     }
 
+    public void ItemsSubscribe()
+    {
+        // Subscribe to each item's Navigation Signal Event
+        foreach (var item in Items)
+        {
+            item.NavigationSignalSent += SelectedItem_NavigationSignalSent;
+        }
+    }
+
+    public void ItemsUnsubscribe()
+    {
+        // Unsubscribe to each item's Navigation Signal Event
+        foreach (var item in Items)
+        {
+            item.NavigationSignalSent -= SelectedItem_NavigationSignalSent;
+        }
+    }
+
     public void PrintItemSelection()
     {
         // Clear the printable rows
         ClearPrintRows();
 
-        // Subscribe to each item's Navigation Signal Event
-        foreach (var item in Items)
-        {
-            item.NavigationSignalSent += SelectedItem_NavigationSignalSent; 
-        }
+        ItemsUnsubscribe();
+        ItemsSubscribe();
 
         List<SelectionItem<T>> items = new List<SelectionItem<T>>(Items.Where(i => i.ItemPage == m_CurrentSelectionPage)); 
         if(items.Count() > 0)
@@ -175,9 +190,9 @@ public class SelectionMenu<T>
 
     private void ClearPrintRows()
     {
-        for (int i = StartRow; i < EndRow; i++)
+        for (int i = RowOffset - 1; i < EndRow + 1; i++)
         {
-            Console.SetCursorPosition(0, StartRow);
+            Console.SetCursorPosition(0, i);
             Console.Write("".PadRight(Console.WindowWidth, ' '));
         }
     }
@@ -227,10 +242,16 @@ public class SelectionMenu<T>
         {
             case SelectionDirection.DOWN:
                 {
-                    if (m_CurrentSelectionRow + 1 > (RowOffset + ItemsPerColumn))
+                    if (m_CurrentSelectionRow + 1 > ItemsPerColumn - 1)
                     {
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE DOWN", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
-                        return;
+                        break;
+                    }
+                    var testSelection = Items.Where(i => i.ItemRow == m_CurrentSelectionRow + 1 && i.ItemColumn == m_CurrentSelectionColumn).FirstOrDefault(); 
+                    if(testSelection is null)
+                    {
+                        NotificationLine.WriteNotificationLine("NO ITEM THIS DIRECTION", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
+                        break;
                     }
                     m_CurrentSelectionRow += 1;
                     if(SelectedItem is not null)
@@ -246,10 +267,10 @@ public class SelectionMenu<T>
                 }
             case SelectionDirection.UP:
                 {
-                    if (m_CurrentSelectionRow - 1 > (RowOffset + ItemsPerColumn))
+                    if (m_CurrentSelectionRow - 1 < 0)
                     {
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE UP", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
-                        return;
+                        break;
                     }
                     m_CurrentSelectionRow -= 1;
                     if(SelectedItem is not null)
@@ -268,7 +289,7 @@ public class SelectionMenu<T>
                     if (m_CurrentSelectionColumn - 1 < 0)
                     {
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE LEFT", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
-                        return;
+                        break;
                     }
                     m_CurrentSelectionColumn -= 1;
                     if(SelectedItem is not null)
@@ -287,7 +308,13 @@ public class SelectionMenu<T>
                     if (m_CurrentSelectionColumn + 1 > Columns - 1)
                     {
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE RIGHT", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
-                        return;
+                        break;
+                    }
+                    var testSelection = Items.Where(i => i.ItemColumn == m_CurrentSelectionColumn + 1 && i.ItemRow == m_CurrentSelectionRow && i.ItemPage == m_CurrentSelectionPage).FirstOrDefault(); 
+                    if(testSelection is null)
+                    {
+                        NotificationLine.WriteNotificationLine("NO ITEM THIS DIRECTION", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
+                        break;
                     }
                     m_CurrentSelectionColumn += 1;
                     if(SelectedItem is not null)
@@ -340,7 +367,7 @@ public class SelectionMenu<T>
                     break;
                 }
             default:
-                return;
+                break;
         }
     }
 }
