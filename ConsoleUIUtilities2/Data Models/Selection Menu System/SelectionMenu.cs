@@ -7,7 +7,8 @@ public class SelectionMenu<T>
     private int m_CurrentPage = 0;
     private int m_CurrentSelectionRow = 0;
     private int m_CurrentSelectionColumn = 0;
-    private int m_CurrentSelectionPage = 0; 
+    private int m_CurrentSelectionPage = 0;
+    private int? m_ColumnOffset; 
     private Action? m_SelectionAction;
     private Action? m_CancellationAction;
     private bool m_BreakMenu = false; 
@@ -57,7 +58,7 @@ public class SelectionMenu<T>
     {
         get
         {
-            return StartRow + m_CurrentRow;
+            return StartRow;
         }
     }
 
@@ -65,7 +66,11 @@ public class SelectionMenu<T>
     {
         get
         {
-            return Console.WindowWidth / Columns; 
+            if(m_ColumnOffset is null)
+            {
+                m_ColumnOffset = GetMaxCaptionLength(); 
+            }
+            return m_ColumnOffset ?? 0; 
         }
     }
 
@@ -96,37 +101,44 @@ public class SelectionMenu<T>
         m_BreakMenu = true; 
     }
 
-    public void PrintItemSelection(ConsoleColor itemColor, ConsoleColor selectionColor, Header header)
+    public void PrintItemSelection()
     {
-        while(!m_BreakMenu)
+        // Clear the printable rows
+        ClearPrintRows();
+
+        // Subscribe to each item's Navigation Signal Event
+        foreach (var item in Items)
         {
-            ClearPrintRows(); 
-            foreach (SelectionItem<T> item in Items)
+            item.NavigationSignalSent += SelectedItem_NavigationSignalSent; 
+        }
+
+        List<SelectionItem<T>> items = new List<SelectionItem<T>>(Items.Where(i => i.ItemPage == m_CurrentSelectionPage)); 
+        if(items.Count() > 0)
+        {
+            do
             {
-                if(item.ItemPage == m_CurrentSelectionPage)
+                foreach (var item in items)
                 {
-                    item.WriteItem(StartRow, ColumnOffset, itemColor);
-                    if(item.ItemRow == 0 && item.ItemColumn == 0)
-                    {
-                        SelectedItem = item; 
-                        item.WriteItemSelected(RowOffset, ColumnOffset, itemColor, selectionColor);
-                    }
+                    item.WriteItem(RowOffset, ColumnOffset,
+                        item.ItemRow == m_CurrentSelectionRow &&
+                        item.ItemColumn == m_CurrentSelectionColumn &&
+                        item.ItemPage == m_CurrentSelectionPage ? true : false);
                 }
-            }
-            if(SelectedItem is not null)
-            {
-                SelectedItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                SelectedItem.MonitorItem();
-            }
+                SelectedItem = Items.Where(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage).FirstOrDefault();
+                if (SelectedItem is not null)
+                {
+                    SelectedItem.MonitorItem();
+                }
+            } while (!m_BreakMenu); 
         }
     }
 
-    public void AddItem(T item, string caption)
+    public void AddItem(T item, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionColor = ConsoleColor.DarkCyan)
     {
-        SelectionItem<T> newSelectioItem = new SelectionItem<T>(item, caption);
+        SelectionItem<T> newSelectioItem = new SelectionItem<T>(item, caption, itemColor, selectionColor);
         newSelectioItem.SetPosition(m_CurrentRow, m_CurrentColumn, m_CurrentPage);
         CalculateNextAvailableAddress();
-        Items.Add(new SelectionItem<T>(item, caption));
+        Items.Add(newSelectioItem);
     }
 
     private int GetMaxCaptionLength()
@@ -144,9 +156,9 @@ public class SelectionMenu<T>
 
     private void CalculateNextAvailableAddress()
     {
-        if (m_CurrentRow + 1 > ItemsPerColumn)
+        if (m_CurrentRow + 1 > ItemsPerColumn - 1)
         {
-            if (m_CurrentColumn + 1 > Columns)
+            if (m_CurrentColumn + 1 > Columns - 1)
             {
                 m_CurrentRow = 0;
                 m_CurrentColumn = 0;
@@ -199,7 +211,10 @@ public class SelectionMenu<T>
                 break;
             case NavigationSignalEventTypes.CANCELLATION:
                 if (m_CancellationAction is not null)
+                {
                     m_CancellationAction();
+                    m_BreakMenu = true;
+                }
                 break;
             default:
                 break;
@@ -218,17 +233,14 @@ public class SelectionMenu<T>
                         return;
                     }
                     m_CurrentSelectionRow += 1;
-                    var oldItem = SelectedItem;
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentPage);
-                    if (oldItem is not null)
+                    if(SelectedItem is not null)
                     {
-                        oldItem.NavigationSignalSent -= SelectedItem_NavigationSignalSent;
-                        oldItem.WriteItem(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset);
                     }
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
@@ -240,17 +252,14 @@ public class SelectionMenu<T>
                         return;
                     }
                     m_CurrentSelectionRow -= 1;
-                    var oldItem = SelectedItem;
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentPage);
-                    if (oldItem is not null)
+                    if(SelectedItem is not null)
                     {
-                        oldItem.NavigationSignalSent -= SelectedItem_NavigationSignalSent;
-                        oldItem.WriteItem(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset); 
                     }
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
@@ -262,17 +271,14 @@ public class SelectionMenu<T>
                         return;
                     }
                     m_CurrentSelectionColumn -= 1;
-                    var oldItem = SelectedItem;
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentPage);
-                    if (oldItem is not null)
+                    if(SelectedItem is not null)
                     {
-                        oldItem.NavigationSignalSent -= SelectedItem_NavigationSignalSent;
-                        oldItem.WriteItem(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset);
                     }
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
@@ -284,17 +290,14 @@ public class SelectionMenu<T>
                         return;
                     }
                     m_CurrentSelectionColumn += 1;
-                    var oldItem = SelectedItem;
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentPage);
-                    if (oldItem is not null)
+                    if(SelectedItem is not null)
                     {
-                        oldItem.NavigationSignalSent -= SelectedItem_NavigationSignalSent;
-                        oldItem.WriteItem(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset);
                     }
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
@@ -309,17 +312,17 @@ public class SelectionMenu<T>
                     m_CurrentSelectionColumn = 0;
                     m_CurrentSelectionRow = 0;
                     ClearPrintRows();
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    PrintItemSelection(); 
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
             case SelectionDirection.PAGE_BACK:
                 {
-                    if (m_CurrentPage - 1 < 0)
+                    if (m_CurrentSelectionPage - 1 < 0)
                     {
                         NotificationLine.WriteNotificationLine("BEGINNING OF LIST", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         return;
@@ -328,11 +331,11 @@ public class SelectionMenu<T>
                     m_CurrentSelectionColumn = 0;
                     m_CurrentSelectionRow = 0;
                     ClearPrintRows();
-                    var newItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
-                    if (newItem is not null)
+                    SelectedItem = Items.FirstOrDefault(i => i.ItemRow == m_CurrentSelectionRow && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage);
+                    PrintItemSelection();
+                    if (SelectedItem is not null)
                     {
-                        newItem.NavigationSignalSent += SelectedItem_NavigationSignalSent;
-                        newItem.WriteItemSelected(ColumnOffset, RowOffset);
+                        SelectedItem.WriteItem(RowOffset, ColumnOffset, true);
                     }
                     break;
                 }
