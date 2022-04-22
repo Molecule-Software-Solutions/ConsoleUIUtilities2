@@ -9,7 +9,8 @@ public class SelectionItem<T>
     public int ItemPage { get; set; }
     public int CaptionLength => Caption.Length;
     public ConsoleColor ItemColor { get; private set; }
-    public ConsoleColor SelectionColor { get; private set; }
+    public ConsoleColor SelectionForeColor { get; private set; }
+    public ConsoleColor SelectionBackColor { get; private set; }
 
     /// <summary>
     /// Returns the underlying item that is stored within the object
@@ -25,26 +26,27 @@ public class SelectionItem<T>
         Console.ResetColor(); 
         if(selected)
         {
-            Console.ForegroundColor = ItemColor;
-            Console.BackgroundColor = SelectionColor;
+            Console.ForegroundColor = SelectionForeColor;
+            Console.BackgroundColor = SelectionBackColor;
             Console.SetCursorPosition(columnOffset * ItemColumn, rowOffset + ItemRow);
-            Console.Write(Caption);
+            Console.Write($"  {Caption}  ");
             Console.ResetColor();
             return; 
         }
         Console.ForegroundColor = ItemColor;
         Console.SetCursorPosition(columnOffset * ItemColumn, rowOffset + ItemRow);
-        Console.Write(Caption);
+        Console.Write($"  {Caption}  ");
         Console.ResetColor();
         return;
     }
 
-    public SelectionItem(T selectionItem, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionColor = ConsoleColor.DarkCyan)
+    public SelectionItem(T selectionItem, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionForeColor = ConsoleColor.Black, ConsoleColor selectionBackColor = ConsoleColor.DarkCyan)
     {
         Item = selectionItem;
         Caption = caption;
-        ItemColor = itemColor; 
-        SelectionColor = selectionColor;
+        ItemColor = itemColor;
+        SelectionForeColor = selectionForeColor;
+        SelectionBackColor = selectionBackColor;
     }
 
     /// <summary>
