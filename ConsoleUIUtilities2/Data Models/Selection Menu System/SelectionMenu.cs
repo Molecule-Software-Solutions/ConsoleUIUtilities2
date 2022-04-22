@@ -1,6 +1,6 @@
 namespace ConsoleUIUtilities2;
 
-public class SelectionMenu<T>
+public class SelectionMenu<T> : IDisposable
 {
     private int m_CurrentColumn = 0;
     private int m_CurrentRow = 0;
@@ -9,15 +9,34 @@ public class SelectionMenu<T>
     private int m_CurrentSelectionColumn = 0;
     private int m_CurrentSelectionPage = 0;
     private int? m_ColumnOffset; 
-    private Action? m_SelectionAction;
+    private ItemSelectionCallback? m_SelectionAction;
     private Action? m_CancellationAction;
-    private bool m_BreakMenu = false; 
-    public SelectionMenu(int startRow, int endRow, Action? selectionAction = null, Action? cancellationAction = null)
+    private Header? m_Header; 
+    private bool m_BreakMenu = false;
+    private bool m_PrintInstructions = false; 
+
+    public SelectionMenu(int startRow, int endRow, ItemSelectionCallback? selectionAction = null, Action? cancellationAction = null, bool printInstructions = false)
     {
         StartRow = startRow;
         EndRow = endRow;
         m_SelectionAction = selectionAction;
         m_CancellationAction = cancellationAction;
+        m_PrintInstructions = printInstructions;
+    }
+
+    public void InjectHeader(Header header)
+    {
+        m_Header = header;
+    }
+
+    public void Init(bool printHeader = false, int headerStartRow = 0, ConsoleColor headerLineColor = ConsoleColor.White, ConsoleColor headerTextColor = ConsoleColor.White)
+    {
+        ConsoleBufferSystem.ClearBuffer();
+        if(printHeader)
+        {
+            m_Header?.WriteHeader(headerStartRow, headerLineColor, headerTextColor);
+        }
+        PrintItemSelection();
     }
 
     public List<SelectionItem<T>> Items { get; set; } = new List<SelectionItem<T>>();
@@ -96,12 +115,21 @@ public class SelectionMenu<T>
         }
     }
 
+    public T? ReturnSelectedItem()
+    {
+        if (SelectedItem is not null)
+        {
+            return SelectedItem.Item;
+        }
+        else return default; 
+    }
+
     public void ExternalBreak()
     {
         m_BreakMenu = true; 
     }
 
-    public void ItemsSubscribe()
+    private void ItemsSubscribe()
     {
         // Subscribe to each item's Navigation Signal Event
         foreach (var item in Items)
@@ -110,7 +138,7 @@ public class SelectionMenu<T>
         }
     }
 
-    public void ItemsUnsubscribe()
+    private void ItemsUnsubscribe()
     {
         // Unsubscribe to each item's Navigation Signal Event
         foreach (var item in Items)
@@ -119,12 +147,46 @@ public class SelectionMenu<T>
         }
     }
 
-    public void PrintItemSelection()
+    private void ClearInstructionRows()
+    {
+        Console.SetCursorPosition(0, EndRow + 1);
+        Console.Write("".PadRight(Console.WindowWidth, ' '));
+        Console.SetCursorPosition(0, EndRow + 2);
+        Console.Write("".PadRight(Console.WindowWidth, ' ')); 
+    }
+
+    private void PrintInstructionRows()
+    {
+        string forwardArrow = "      "; 
+        string reverseArrow = "      ";
+
+        if(m_CurrentSelectionPage > 0)
+        {
+            reverseArrow = "( <- )";
+        }
+
+        if(m_CurrentSelectionPage != Pages - 1 && Pages > 1)
+        {
+            forwardArrow = "( -> )"; 
+        }
+
+        if(m_PrintInstructions)
+        {
+            CenteredLine.PrintToConsole($"{reverseArrow} USE ARROWS TO MOVE SELECTION. (F7) PAGE BACK (F8) PAGE FORWARD {forwardArrow}", EndRow + 1, ConsoleColor.Yellow);
+            CenteredLine.PrintToConsole("(ENTER) ACCEPTS SELECTION          (ESC) CANCEL", EndRow + 2, ConsoleColor.Yellow); 
+        }
+    }
+
+    private void PrintItemSelection()
     {
         // Clear the printable rows
         ClearPrintRows();
         ItemsUnsubscribe();
         ItemsSubscribe();
+
+        // Write instructions for selection menu use
+        ClearInstructionRows();
+        PrintInstructionRows(); 
 
         List<SelectionItem<T>> items = new List<SelectionItem<T>>(Items.Where(i => i.ItemPage == m_CurrentSelectionPage)); 
         if(items.Count() > 0)
@@ -147,9 +209,9 @@ public class SelectionMenu<T>
         }
     }
 
-    public void AddItem(T item, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionColor = ConsoleColor.DarkCyan)
+    public void AddItem(T item, string caption, ConsoleColor itemColor = ConsoleColor.White, ConsoleColor selectionForeColor = ConsoleColor.Black, ConsoleColor selectionBackColor = ConsoleColor.DarkCyan)
     {
-        SelectionItem<T> newSelectioItem = new SelectionItem<T>(item, caption, itemColor, selectionColor);
+        SelectionItem<T> newSelectioItem = new SelectionItem<T>(item, caption, itemColor, selectionForeColor, selectionBackColor);
         newSelectioItem.SetPosition(m_CurrentRow, m_CurrentColumn, m_CurrentPage);
         CalculateNextAvailableAddress();
         Items.Add(newSelectioItem);
@@ -221,7 +283,18 @@ public class SelectionMenu<T>
                 break;
             case NavigationSignalEventTypes.SELECTION_MADE:
                 if (m_SelectionAction is not null)
-                    m_SelectionAction();
+                {
+                    if(SelectedItem is not null)
+                    {
+                        m_SelectionAction(SelectedItem.Item);
+                        break; 
+                    }
+                    else
+                    {
+                        Dialog dlg = new Dialog("EXCEPTION", "THE SELECTED ITEM WAS NULL");
+                        dlg.Show('*', ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Red);
+                    }
+                }
                 break;
             case NavigationSignalEventTypes.CANCELLATION:
                 if (m_CancellationAction is not null)
@@ -333,7 +406,7 @@ public class SelectionMenu<T>
                 }
             case SelectionDirection.PAGE_FORWARD:
                 {
-                    if (m_CurrentSelectionPage + 1 > Pages)
+                    if (m_CurrentSelectionPage + 1 > Pages - 1)
                     {
                         NotificationLine.WriteNotificationLine("NO MORE PAGES", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         return;
@@ -375,4 +448,14 @@ public class SelectionMenu<T>
                 break;
         }
     }
+
+    public void Dispose()
+    {
+        foreach(var item in Items)
+        {
+            item.NavigationSignalSent -= SelectedItem_NavigationSignalSent; 
+        }
+    }
+
+    public delegate void ItemSelectionCallback(T item); 
 }
