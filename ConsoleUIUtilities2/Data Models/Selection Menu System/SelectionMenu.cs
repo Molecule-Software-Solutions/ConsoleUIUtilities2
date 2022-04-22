@@ -123,7 +123,6 @@ public class SelectionMenu<T>
     {
         // Clear the printable rows
         ClearPrintRows();
-
         ItemsUnsubscribe();
         ItemsSubscribe();
 
@@ -247,12 +246,13 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE DOWN", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
-                    var testSelection = Items.Where(i => i.ItemRow == m_CurrentSelectionRow + 1 && i.ItemColumn == m_CurrentSelectionColumn).FirstOrDefault(); 
+                    var testSelection = Items.Where(i => i.ItemRow == m_CurrentSelectionRow + 1 && i.ItemColumn == m_CurrentSelectionColumn && i.ItemPage == m_CurrentSelectionPage).FirstOrDefault(); 
                     if(testSelection is null)
                     {
                         NotificationLine.WriteNotificationLine("NO ITEM THIS DIRECTION", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionRow += 1;
                     if(SelectedItem is not null)
                     {
@@ -272,6 +272,7 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE UP", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionRow -= 1;
                     if(SelectedItem is not null)
                     {
@@ -291,6 +292,7 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("YOU CANNOT MOVE LEFT", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionColumn -= 1;
                     if(SelectedItem is not null)
                     {
@@ -316,6 +318,7 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("NO ITEM THIS DIRECTION", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionColumn += 1;
                     if(SelectedItem is not null)
                     {
@@ -335,6 +338,7 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("NO MORE PAGES", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         return;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionPage += 1;
                     m_CurrentSelectionColumn = 0;
                     m_CurrentSelectionRow = 0;
@@ -354,6 +358,7 @@ public class SelectionMenu<T>
                         NotificationLine.WriteNotificationLine("BEGINNING OF LIST", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         return;
                     }
+                    NotificationLine.ClearNotificationLine();
                     m_CurrentSelectionPage -= 1;
                     m_CurrentSelectionColumn = 0;
                     m_CurrentSelectionRow = 0;
