@@ -59,17 +59,15 @@ namespace ConsoleUIUtilities2
         /// <param name="textColor">text color within the header</param>
         public void WriteHeader(int row, ConsoleColor lineColor = ConsoleColor.White, ConsoleColor textColor = ConsoleColor.White)
         {
-            int startRow = row;
-            Console.SetCursorPosition(0, startRow);
-            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, m_TopLineChar), lineColor); 
+            int startRow = row; 
+            HorizontalLine.WriteHorizontalLine(m_TopLineChar, startRow, lineColor);
             startRow += 1;
             foreach (string line in m_HeaderLines)
             {
                 CenteredLine.PrintToConsole(line, startRow, textColor);
                 startRow += 1;
             }
-            Console.SetCursorPosition(0, startRow);
-            ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, m_BottomLineChar), lineColor); 
+            HorizontalLine.WriteHorizontalLine(m_BottomLineChar, startRow, lineColor);
         }
     }
 }
