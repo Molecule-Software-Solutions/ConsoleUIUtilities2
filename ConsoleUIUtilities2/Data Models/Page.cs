@@ -201,13 +201,13 @@
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        public virtual void TakeInData<T>(T? data) { }
+        public virtual void TakeInData<T>(T data) { }
 
         /// <summary>
         /// Allows the developer to pass secondary data into the page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        public virtual void TakeInSecondaryData<T>(T? data) { }
+        public virtual void TakeInSecondaryData<T>(T data) { }
     }
 }
