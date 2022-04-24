@@ -43,6 +43,14 @@
             InitComponent();
         }
 
+        /// <summary>
+        /// Shows the page only. 
+        /// NOTE: This method calls the <see cref="ShowPostInitItems"/> method which will display items that cannot be added during
+        /// the <see cref="BuildComponent"/> call during page init. 
+        /// </summary>
+        /// <param name="headerRow"></param>
+        /// <param name="headerLineColor"></param>
+        /// <param name="headerTextColor"></param>
         public void ShowPageOnly(int headerRow = 0, ConsoleColor headerLineColor = ConsoleColor.White, ConsoleColor headerTextColor = ConsoleColor.White)
         {
             ConsoleBufferSystem.ClearBuffer(); 
@@ -57,8 +65,24 @@
                 Header.AddHeaderLine(Title?? string.Empty);
                 Header.WriteHeader(headerRow, headerLineColor, headerTextColor); 
             }
+            ShowPostInitItems(); 
         }
 
+        /// <summary>
+        /// Inits the page and shows the page's menu
+        /// NOTE: The <see cref="Menu"/> should be added in the <see cref="BuildComponent"/> method 
+        /// </summary>
+        /// <param name="headerRow"></param>
+        /// <param name="menuStartRow"></param>
+        /// <param name="menuJustification"></param>
+        /// <param name="menuHeaderText"></param>
+        /// <param name="menuItemColor"></param>
+        /// <param name="headerLineColor"></param>
+        /// <param name="headerTextColor"></param>
+        /// <param name="callbackMessageColor"></param>
+        /// <param name="callbackLineColor"></param>
+        /// <param name="callbackPromptColor"></param>
+        /// <param name="onMenuBreakCallPageRedraw"></param>
         public void ShowAndLoadMenu(int headerRow = 0,
             int menuStartRow = 6,
             int menuJustification = 15,
@@ -89,6 +113,21 @@
             onMenuBreakCallPageRedraw); 
         }
 
+        /// <summary>
+        /// Inits the page and shows the page's inputs
+        /// NOTE: The <see cref="InputFieldSet"/> should be added in the <see cref="BuildComponent"/> method
+        /// </summary>
+        /// <param name="headerRow"></param>
+        /// <param name="inputStartRow"></param>
+        /// <param name="inputJustification"></param>
+        /// <param name="headerLineColor"></param>
+        /// <param name="headerTextColor"></param>
+        /// <param name="inputPromptTextColor"></param>
+        /// <param name="inputValueTextColor"></param>
+        /// <param name="callbackMessageColor"></param>
+        /// <param name="callbackLineColor"></param>
+        /// <param name="callbackPromptColor"></param>
+        /// <param name="collectValuesAsAllUppercase"></param>
         public void ShowAndLoadInputs(int headerRow = 0,
             int inputStartRow = 5,
             int inputJustification = 15,
@@ -110,6 +149,10 @@
             }, collectValuesAsAllUppercase); 
         }
 
+        /// <summary>
+        /// Calls a callback method of the developer's choosing on a page close
+        /// </summary>
+        /// <param name="closeCallback"></param>
         public void Close(Action closeCallback)
         {
             closeCallback(); 
@@ -120,15 +163,51 @@
             NotificationLine.WriteNotificationLine("INVALID KEY PRESSED", ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.White, "NOTICE");
         }
 
+        /// <summary>
+        /// Inits the page. The default action is to call <see cref="BuildComponent"/> which adds components to the page
+        /// </summary>
         public virtual void InitComponent()
         {
             BuildComponent(); 
         }
+
+        /// <summary>
+        /// Allows the developer to set the components for the page. NOTE: If you wish to display items after init is called you must use the
+        /// <see cref="ShowPostInitItems"/> method. 
+        /// </summary>
         protected virtual void BuildComponent() {}
 
+        /// <summary>
+        /// Returns an input value that matches the identifier ID
+        /// IF: No ID is located within the inputs then an empty string will be returned. 
+        /// </summary>
+        /// <param name="identifierID"></param>
+        /// <returns></returns>
         public virtual string GetInputValue(string identifierID)
         {
             return InputFieldSet?.GetValue(identifierID) ?? string.Empty; 
         }
+
+        /// <summary>
+        /// Allows the developer to display items after the initial build has completed
+        /// </summary>
+        public virtual void ShowPostInitItems()
+        {
+            Console.ReadLine(); 
+        }
+
+        /// <summary>
+        /// Allows the developer to pass data into the page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        public virtual void TakeInData<T>(T? data) { }
+
+        /// <summary>
+        /// Allows the developer to pass secondary data into the page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        public virtual void TakeInSecondaryData<T>(T? data) { }
     }
 }
