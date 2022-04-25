@@ -138,14 +138,14 @@ namespace ConsoleUIUtilities2
         /// <param name="identifier"></param>
         /// <param name="valueColor"></param>
         /// <param name="statusCallback"></param>
-        public void ClearAndRetakeValue(string identifier, ConsoleColor valueColor = ConsoleColor.White, StatusCallback? statusCallback = null)
+        public void ClearAndRetakeValue(string identifier, ConsoleColor valueColor = ConsoleColor.White, StatusCallback? statusCallback = null, bool storeUppercase = false)
         {
             var result = m_Inputs.Where(i => i.IdentifierID == identifier).FirstOrDefault();
             if (result is not null)
             {
                 Console.SetCursorPosition(result.InputValueStartPositionColumn, result.InputValueStartPositionRow);
                 ConsoleBufferSystem.Write("".PadRight(result.InputValue.Length));
-                TakeInputValue(identifier, valueColor, statusCallback);
+                TakeInputValue(identifier, valueColor, statusCallback, storeUppercase);
             }
         }
 
