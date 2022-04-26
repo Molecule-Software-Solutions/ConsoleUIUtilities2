@@ -97,6 +97,7 @@
         {
             ConsoleBufferSystem.ClearBuffer(); 
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            ShowPostInitItems(); 
             Menu?.BeginMenuLoop(
                 menuStartRow,
                 menuJustification,
@@ -142,6 +143,7 @@
         {
             ConsoleBufferSystem.ClearBuffer(); 
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            ShowPostInitItems(); 
             InputFieldSet?.WriteMultipleInputs(inputStartRow, inputJustification, inputPromptTextColor);
             InputFieldSet?.TakeAllInputValues(inputValueTextColor, (cb) =>
             {
