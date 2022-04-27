@@ -229,10 +229,7 @@
         /// <summary>
         /// Allows the developer to display items after the initial build has completed
         /// </summary>
-        public virtual void ShowPostInitItems()
-        {
-            Console.ReadLine(); 
-        }
+        public virtual void ShowPostInitItems() { }
 
         /// <summary>
         /// Allows the developer to pass data into the page
