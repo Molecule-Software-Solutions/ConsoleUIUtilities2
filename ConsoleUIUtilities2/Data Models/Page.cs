@@ -5,6 +5,7 @@
         public string? Title { get; private set; }
         public Header? Header { get; private set; }
         public Menu? Menu { get; private set; }
+        public DisplayItemSet? DisplayItemSet { get; private set; }
         public InputFieldSet? InputFieldSet { get; private set; }
 
         public void SetTitle(string title)
@@ -34,12 +35,18 @@
             InputFieldSet = inputFieldSet;
         }
 
-        public Page(string title = "", Header? header = null, InputFieldSet? inputFieldSet = null, Menu? menu = null)
+        public void SetDisplayItemSet(DisplayItemSet displayItemSet)
+        {
+            DisplayItemSet = displayItemSet; 
+        }
+
+        public Page(string title = "", Header? header = null, InputFieldSet? inputFieldSet = null, Menu? menu = null, DisplayItemSet? displayItemSet = null)
         {
             Title = title;
             Header = header;
             InputFieldSet = inputFieldSet;
             Menu = menu;
+            DisplayItemSet = displayItemSet; 
             InitComponent();
         }
 
@@ -112,6 +119,35 @@
             }, 
             InvalidMenuSelectionNotice, 
             onMenuBreakCallPageRedraw); 
+        }
+
+        /// <summary>
+        /// Inits the page and shows the page's display items
+        /// NOTE: The <see cref="DisplayItemSet"/> should be added in the <see cref="BuildComponent"/> method
+        /// </summary>
+        /// <param name="headerRow"></param>
+        /// <param name="headerLineColor"></param>
+        /// <param name="headerTextColor"></param>
+        /// <param name="inputPromptTextColor"></param>
+        /// <param name="inputValueTextColor"></param>
+        /// <param name="callbackMessageColor"></param>
+        /// <param name="callbackLineColor"></param>
+        /// <param name="callbackPromptColor"></param>
+        /// <param name="collectValuesAsAllUppercase"></param>
+        public void ShowAndLoadDisplayItems(int headerRow = 0,
+            ConsoleColor headerLineColor = ConsoleColor.White,
+            ConsoleColor headerTextColor = ConsoleColor.White,
+            ConsoleColor inputPromptTextColor = ConsoleColor.White,
+            ConsoleColor inputValueTextColor = ConsoleColor.White,
+            ConsoleColor callbackMessageColor = ConsoleColor.White,
+            ConsoleColor callbackLineColor = ConsoleColor.White,
+            ConsoleColor callbackPromptColor = ConsoleColor.White, 
+            bool collectValuesAsAllUppercase = false)
+        {
+            ConsoleBufferSystem.ClearBuffer(); 
+            Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            ShowPostInitItems();
+            DisplayItemSet?.WriteAllDisplayItems(); 
         }
 
         /// <summary>
