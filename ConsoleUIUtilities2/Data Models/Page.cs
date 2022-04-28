@@ -3,7 +3,7 @@
     public abstract class Page
     {
         private bool m_DisplayItemsLoopBreak;
-        private object? m_DisplayItemData; 
+        protected object? m_DisplayItemData; 
 
         public string? Title { get; private set; }
         public Header? Header { get; private set; }
