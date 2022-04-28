@@ -8,6 +8,6 @@ public class DisplayItemsContainer : PageContainer<DisplayItemsTestPage>
 
     public override void ShowPage()
     {
-        Page.ShowAndLoadDisplayItems(headerLineColor: ConsoleColor.Cyan, headerTextColor: ConsoleColor.Yellow, holdPageInLoop: true); 
+        Page.ShowAndLoadDisplayItems(data: null, headerLineColor: ConsoleColor.Cyan, headerTextColor: ConsoleColor.Yellow, holdPageInLoop: true); 
     }
 }
