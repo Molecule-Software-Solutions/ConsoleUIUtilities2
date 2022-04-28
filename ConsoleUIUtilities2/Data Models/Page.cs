@@ -2,6 +2,8 @@
 {
     public abstract class Page
     {
+        private bool m_DisplayItemsLoopBreak;
+
         public string? Title { get; private set; }
         public Header? Header { get; private set; }
         public Menu? Menu { get; private set; }
@@ -10,19 +12,19 @@
 
         public void SetTitle(string title)
         {
-            Title = title; 
+            Title = title;
         }
 
         public void SetHeader(Header? header = null)
         {
-            if(header is not null)
+            if (header is not null)
             {
                 Header = header;
-                return; 
+                return;
             }
-            Header = new Header(); 
+            Header = new Header();
             Header.AddHeaderLine(Title ?? "NO TITLE SET");
-            Header.SetTopAndBottomLineChars('-'); 
+            Header.SetTopAndBottomLineChars('-');
         }
 
         public void SetMenu(Menu menu)
@@ -37,7 +39,7 @@
 
         public void SetDisplayItemSet(DisplayItemSet displayItemSet)
         {
-            DisplayItemSet = displayItemSet; 
+            DisplayItemSet = displayItemSet;
         }
 
         public Page(string title = "", Header? header = null, InputFieldSet? inputFieldSet = null, Menu? menu = null, DisplayItemSet? displayItemSet = null)
@@ -46,7 +48,7 @@
             Header = header;
             InputFieldSet = inputFieldSet;
             Menu = menu;
-            DisplayItemSet = displayItemSet; 
+            DisplayItemSet = displayItemSet;
             InitComponent();
         }
 
@@ -60,19 +62,19 @@
         /// <param name="headerTextColor"></param>
         public void ShowPageOnly(int headerRow = 0, ConsoleColor headerLineColor = ConsoleColor.White, ConsoleColor headerTextColor = ConsoleColor.White)
         {
-            ConsoleBufferSystem.ClearBuffer(); 
-            if(Header is not null)
+            ConsoleBufferSystem.ClearBuffer();
+            if (Header is not null)
             {
-                Header.WriteHeader(headerRow, headerLineColor, headerTextColor); 
+                Header.WriteHeader(headerRow, headerLineColor, headerTextColor);
             }
             else
             {
                 Header = new Header();
                 Header.SetTopAndBottomLineChars('-');
-                Header.AddHeaderLine(Title?? string.Empty);
-                Header.WriteHeader(headerRow, headerLineColor, headerTextColor); 
+                Header.AddHeaderLine(Title ?? string.Empty);
+                Header.WriteHeader(headerRow, headerLineColor, headerTextColor);
             }
-            ShowPostInitItems(); 
+            ShowPostInitItems();
         }
 
         /// <summary>
@@ -102,9 +104,9 @@
             ConsoleColor callbackPromptColor = ConsoleColor.White,
             bool onMenuBreakCallPageRedraw = false)
         {
-            ConsoleBufferSystem.ClearBuffer(); 
+            ConsoleBufferSystem.ClearBuffer();
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
-            ShowPostInitItems(); 
+            ShowPostInitItems();
             Menu?.BeginMenuLoop(
                 menuStartRow,
                 menuJustification,
@@ -116,38 +118,46 @@
             {
                 ConsoleBufferSystem.ClearBuffer();
                 Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
-            }, 
-            InvalidMenuSelectionNotice, 
-            onMenuBreakCallPageRedraw); 
+            },
+            InvalidMenuSelectionNotice,
+            onMenuBreakCallPageRedraw);
         }
 
         /// <summary>
-        /// Inits the page and shows the page's display items
-        /// NOTE: The <see cref="DisplayItemSet"/> should be added in the <see cref="BuildComponent"/> method
+        /// Displays the page and displays all display items that are in the display item set:
+        /// NOTE: If you wish to hold this page in a loop you may do so by passing true in the
+        /// holdPageInLoop parameter. You may request a console key entry to break this loop using
+        /// the DisplayPostInitItems virtual method or you can call BreakDisplayItemsLoopExternal
         /// </summary>
         /// <param name="headerRow"></param>
         /// <param name="headerLineColor"></param>
         /// <param name="headerTextColor"></param>
-        /// <param name="inputPromptTextColor"></param>
-        /// <param name="inputValueTextColor"></param>
-        /// <param name="callbackMessageColor"></param>
-        /// <param name="callbackLineColor"></param>
-        /// <param name="callbackPromptColor"></param>
-        /// <param name="collectValuesAsAllUppercase"></param>
+        /// <param name="holdPageInLoop"></param>
         public void ShowAndLoadDisplayItems(int headerRow = 0,
             ConsoleColor headerLineColor = ConsoleColor.White,
             ConsoleColor headerTextColor = ConsoleColor.White,
-            ConsoleColor inputPromptTextColor = ConsoleColor.White,
-            ConsoleColor inputValueTextColor = ConsoleColor.White,
-            ConsoleColor callbackMessageColor = ConsoleColor.White,
-            ConsoleColor callbackLineColor = ConsoleColor.White,
-            ConsoleColor callbackPromptColor = ConsoleColor.White, 
-            bool collectValuesAsAllUppercase = false)
+            bool holdPageInLoop = false)
         {
-            ConsoleBufferSystem.ClearBuffer(); 
+            if (holdPageInLoop)
+            {
+                while (!m_DisplayItemsLoopBreak)
+                {
+                    ConsoleBufferSystem.ClearBuffer();
+                    Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+                    DisplayItemSet?.WriteAllDisplayItems();
+                    ShowPostInitItems();
+                }
+                return;
+            }
+            ConsoleBufferSystem.ClearBuffer();
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
+            DisplayItemSet?.WriteAllDisplayItems();
             ShowPostInitItems();
-            DisplayItemSet?.WriteAllDisplayItems(); 
+        }
+
+        public void BreakDisplayItemLoopExternal()
+        {
+            m_DisplayItemsLoopBreak = true;
         }
 
         /// <summary>
@@ -174,17 +184,17 @@
             ConsoleColor inputValueTextColor = ConsoleColor.White,
             ConsoleColor callbackMessageColor = ConsoleColor.White,
             ConsoleColor callbackLineColor = ConsoleColor.White,
-            ConsoleColor callbackPromptColor = ConsoleColor.White, 
+            ConsoleColor callbackPromptColor = ConsoleColor.White,
             bool collectValuesAsAllUppercase = false)
         {
-            ConsoleBufferSystem.ClearBuffer(); 
+            ConsoleBufferSystem.ClearBuffer();
             Header?.WriteHeader(headerRow, headerLineColor, headerTextColor);
-            ShowPostInitItems(); 
+            ShowPostInitItems();
             InputFieldSet?.WriteMultipleInputs(inputStartRow, inputJustification, inputPromptTextColor);
             InputFieldSet?.TakeAllInputValues(inputValueTextColor, (cb) =>
             {
-                NotificationLine.WriteNotificationLine(cb, callbackMessageColor, callbackLineColor, callbackPromptColor, "INPUT ALERT"); 
-            }, collectValuesAsAllUppercase); 
+                NotificationLine.WriteNotificationLine(cb, callbackMessageColor, callbackLineColor, callbackPromptColor, "INPUT ALERT");
+            }, collectValuesAsAllUppercase);
         }
 
         /// <summary>
@@ -193,7 +203,7 @@
         /// <param name="closeCallback"></param>
         public void Close(Action closeCallback)
         {
-            closeCallback(); 
+            closeCallback();
         }
 
         private void InvalidMenuSelectionNotice()
@@ -206,14 +216,14 @@
         /// </summary>
         public virtual void InitComponent()
         {
-            BuildComponent(); 
+            BuildComponent();
         }
 
         /// <summary>
         /// Allows the developer to set the components for the page. NOTE: If you wish to display items after init is called you must use the
         /// <see cref="ShowPostInitItems"/> method. 
         /// </summary>
-        protected virtual void BuildComponent() {}
+        protected virtual void BuildComponent() { }
 
         /// <summary>
         /// Returns an input value that matches the identifier ID
@@ -223,7 +233,7 @@
         /// <returns></returns>
         public virtual string GetInputValue(string identifierID)
         {
-            return InputFieldSet?.GetValue(identifierID) ?? string.Empty; 
+            return InputFieldSet?.GetValue(identifierID) ?? string.Empty;
         }
 
         /// <summary>
