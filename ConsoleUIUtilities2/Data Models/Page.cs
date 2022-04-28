@@ -3,6 +3,7 @@
     public abstract class Page
     {
         private bool m_DisplayItemsLoopBreak;
+        private object? m_DisplayItemData; 
 
         public string? Title { get; private set; }
         public Header? Header { get; private set; }
@@ -129,15 +130,24 @@
         /// holdPageInLoop parameter. You may request a console key entry to break this loop using
         /// the DisplayPostInitItems virtual method or you can call BreakDisplayItemsLoopExternal
         /// </summary>
+        /// <param name="data"></param>
         /// <param name="headerRow"></param>
         /// <param name="headerLineColor"></param>
         /// <param name="headerTextColor"></param>
         /// <param name="holdPageInLoop"></param>
-        public void ShowAndLoadDisplayItems(int headerRow = 0,
+        public void ShowAndLoadDisplayItems(object? data = null, int headerRow = 0,
             ConsoleColor headerLineColor = ConsoleColor.White,
             ConsoleColor headerTextColor = ConsoleColor.White,
             bool holdPageInLoop = false)
         {
+            if(data is not null)
+            {
+                m_DisplayItemData = data; 
+            }
+
+            // Build display item components after data is set
+            BuildDisplayItemComponents(); 
+
             if (holdPageInLoop)
             {
                 while (!m_DisplayItemsLoopBreak)
@@ -224,6 +234,14 @@
         /// <see cref="ShowPostInitItems"/> method. 
         /// </summary>
         protected virtual void BuildComponent() { }
+
+        /// <summary>
+        /// Builds display items specifically once data is passed into the ShowAndLoadDisplayItems
+        /// method. This works similarly to BuildComponent, except the build occurs after the page
+        /// initiation, allowing data to be passed into the page after creation as opposed to being
+        /// restricted to the build phase
+        /// </summary>
+        protected virtual void BuildDisplayItemComponents() { }
 
         /// <summary>
         /// Returns an input value that matches the identifier ID
