@@ -23,27 +23,26 @@ namespace ConsoleUIUtilities2
             ConsoleColor notificationLineColor =
             ConsoleColor.White,
             ConsoleColor notificationLineMessageColor = ConsoleColor.White,
-            string notificationLineText = "")
+            string notificationLineText = "",
+            int notificationLineStartPosition = 27)
         {
-            int writePosition = Console.WindowHeight - 1;
-            ClearNotificationLine();
-            Console.SetCursorPosition(0, writePosition - 1);
+            ClearNotificationLine(27);
+            Console.SetCursorPosition(0, notificationLineStartPosition);
             ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, '-'), notificationLineColor);
-            Console.SetCursorPosition(5, writePosition - 1);
+            Console.SetCursorPosition(5, notificationLineStartPosition);
             ConsoleBufferSystem.Write($"[ {notificationLineText} ]", notificationLineMessageColor);
-            Console.SetCursorPosition(0, writePosition);
+            Console.SetCursorPosition(0, notificationLineStartPosition + 1);
             ConsoleBufferSystem.Write(line, color); 
         }
 
         /// <summary>
         /// Clears the notification line
         /// </summary>
-        public static void ClearNotificationLine()
+        public static void ClearNotificationLine(int notificationLineStartPosition = 27)
         {
-            int writePosition = Console.WindowHeight - 1;
-            Console.SetCursorPosition(0, writePosition - 1);
+            Console.SetCursorPosition(0, notificationLineStartPosition);
             ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, ' '));
-            Console.SetCursorPosition(0, writePosition);
+            Console.SetCursorPosition(0, notificationLineStartPosition + 1);
             ConsoleBufferSystem.Write("".PadRight(Console.WindowWidth, ' '));
         }
     }

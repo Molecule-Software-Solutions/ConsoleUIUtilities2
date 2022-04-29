@@ -22,11 +22,13 @@ public class DisplayItemsTestPage : Page
     public override void ShowPostInitItems()
     {
         // Demonstrates how to break a display item page with no other controls
+        NotificationLine.WriteNotificationLine("TEST", color: ConsoleColor.Blue, notificationLineText: "TEST"); 
         CenteredLine.PrintToConsole("TO BREAK PRESS ENTER", 15, ConsoleColor.Blue);
         if(Console.ReadKey().Key == ConsoleKey.Enter)
         {
             BreakDisplayItemLoopExternal(); 
         }
+
     }
 
 }

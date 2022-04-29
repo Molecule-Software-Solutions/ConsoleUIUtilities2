@@ -444,7 +444,7 @@ public class SelectionMenu<T> : IDisposable
                         NotificationLine.WriteNotificationLine("NO ITEM THIS DIRECTION", ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.Red, "INVALID MOVE");
                         break;
                     }
-                    NotificationLine.ClearNotificationLine();
+                    NotificationLine.ClearNotificationLine(27);
                     m_CurrentSelectionRow += 1;
                     if(SelectedItem is not null)
                     {
