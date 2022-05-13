@@ -9,6 +9,7 @@ namespace ConsoleUIUtilities2
     public class Menu
     {
         bool m_MenuBreakToken = false;
+        Action? m_PostReloadAction;
 
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 
@@ -19,6 +20,15 @@ namespace ConsoleUIUtilities2
         public void AddMenuItem(MenuItem menuItem)
         {
             MenuItems.Add(menuItem); 
+        }
+
+        /// <summary>
+        /// Sets the action that will occur after the menu is reloaded (when not broken)
+        /// </summary>
+        /// <param name="action"></param>
+        public void SetPostReloadAction(Action action)
+        {
+            m_PostReloadAction = action; 
         }
 
         /// <summary>
@@ -102,6 +112,11 @@ namespace ConsoleUIUtilities2
         {
             while (!m_MenuBreakToken)
             {
+                if(m_PostReloadAction is not null)
+                {
+                    m_PostReloadAction(); 
+                }
+                
                 var keyPressed = ActivateMenu(menuStartRow, menuJustification, menuHeaderText, menuItemsColor); 
                 var selectedMenuItem = MenuItems.Where(m => m.MenuItemTriggerKeys.Contains(keyPressed)).FirstOrDefault();
                 if(selectedMenuItem is not null)
